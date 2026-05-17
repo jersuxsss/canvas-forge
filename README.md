@@ -16,8 +16,8 @@
 
 | Feature | Description |
 |---|---|
-| 🎨 **5 Built-in Card Builders** | Welcome, Leave, Rank, Level-Up, and Profile cards |
-| 🛠️ **Custom Canvas Builder** | Full creative freedom for your own designs |
+| 🎨 **9 Built-in Card Builders** | Welcome, Leave, Rank, Level-Up, Profile, Boost, Info, Leaderboard & Spotify cards |
+| 🛠️ **Custom Canvas Builder** | Full creative freedom for your own designs with 20+ drawing methods |
 | ⚡ **High Performance** | Powered by Skia engine via `@napi-rs/canvas` |
 | 📦 **Zero System Dependencies** | No Cairo, no Pango, no `node-gyp` — just `npm install` |
 | 🔷 **TypeScript First** | Full type definitions and IntelliSense support |
@@ -112,6 +112,68 @@ const card = await new ProfileCardBuilder()
   .build();
 ```
 
+### Boost Card ✨ NEW
+
+```typescript
+import { BoostCardBuilder } from 'canvas-forge';
+
+const card = await new BoostCardBuilder()
+  .setAvatar(member.user.displayAvatarURL({ extension: 'png', size: 512 }))
+  .setUsername(member.user.username)
+  .setGuildName(member.guild.name)
+  .setBoostCount(15)
+  .setAccentColor('#f47fff')
+  .build();
+```
+
+### Info Card ✨ NEW
+
+```typescript
+import { InfoCardBuilder } from 'canvas-forge';
+
+const card = await new InfoCardBuilder()
+  .setTitle('Server Rules')
+  .setDescription('Please follow these rules to keep the server friendly.')
+  .addField({ name: 'Rule 1', value: 'Be respectful' })
+  .addField({ name: 'Rule 2', value: 'No spam' })
+  .addField({ name: 'Members', value: '1,500', inline: true })
+  .addField({ name: 'Online', value: '320', inline: true })
+  .setFooter('Last updated: May 2026')
+  .setAccentColor('#5865F2')
+  .build();
+```
+
+### Leaderboard Card ✨ NEW
+
+```typescript
+import { LeaderboardCardBuilder } from 'canvas-forge';
+
+const card = await new LeaderboardCardBuilder()
+  .setTitle('🏆 XP Leaderboard')
+  .addEntry({ rank: 1, username: 'Jersuxs', score: 25400 })
+  .addEntry({ rank: 2, username: 'Alice', score: 19200 })
+  .addEntry({ rank: 3, username: 'Bob', score: 15800 })
+  .setScoreLabel('XP')
+  .build();
+```
+
+### Spotify / Now Playing Card ✨ NEW
+
+```typescript
+import { SpotifyCardBuilder } from 'canvas-forge';
+
+const card = await new SpotifyCardBuilder()
+  .setSongTitle('Blinding Lights')
+  .setArtist('The Weeknd')
+  .setAlbum('After Hours')
+  .setAlbumArt('https://example.com/cover.jpg')
+  .setElapsed(90000)
+  .setDuration(200000)
+  .setIsPlaying(true)
+  .setProgressBarColor('#1DB954')
+  .build();
+```
+
 ### Custom Canvas
 
 ```typescript
@@ -119,9 +181,13 @@ import { CanvasBuilder } from 'canvas-forge';
 
 const buffer = new CanvasBuilder(800, 400)
   .setBackground('#1a1a2e')
-  .drawRect(20, 20, 760, 360, '#16213e', 15)
+  .drawShadow()
+  .drawGradientRect(20, 20, 760, 360, { colors: ['#e94560', '#0f3460'] }, 15)
+  .clearShadow()
+  .drawLine(40, 200, 760, 200, '#ffffff', 1)
   .setFont(32, 'sans-serif', 'bold')
   .drawText('My Custom Card', 400, 60, '#e94560', 'center')
+  .drawPolygon([[400, 100], [500, 180], [400, 260], [300, 180]], '#5865F2')
   .drawProgressBar(50, 300, 700, 30, 0.75, '#e94560', '#2a2a3e')
   .toBuffer();
 ```

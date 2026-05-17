@@ -1,15 +1,8 @@
-# Getting Started with canvas-forge
+# Getting Started
 
-This guide will walk you through installing canvas-forge and creating your first Discord card.
-
-## Prerequisites
-
-- **Node.js** 18 or higher
-- A **Discord bot** project (using [discord.js](https://discord.js.org/) v14 recommended)
+Welcome to **canvas-forge**! This guide will help you get up and running in minutes.
 
 ## Installation
-
-Choose your preferred package manager:
 
 ```bash
 # npm
@@ -22,22 +15,72 @@ yarn add canvas-forge
 pnpm add canvas-forge
 ```
 
-That's it! No system dependencies required. No Cairo, no Pango, no `node-gyp` — canvas-forge uses `@napi-rs/canvas` which ships with pre-built binaries.
+> **Note:** canvas-forge requires **Node.js 18** or higher.
 
-## Your First Welcome Card
+## Your First Card
 
-### 1. Import the builder
+Let's create a simple welcome card:
 
 ```typescript
 import { WelcomeCardBuilder } from 'canvas-forge';
-import { AttachmentBuilder, Events } from 'discord.js';
+import fs from 'fs';
+
+const card = await new WelcomeCardBuilder()
+  .setUsername('Jersuxs')
+  .setGuildName('My Server')
+  .setMemberCount(1500)
+  .setTitleText('Welcome!')
+  .setBackground('#1a1a2e')
+  .build();
+
+// Save to file
+fs.writeFileSync('welcome.png', card);
 ```
 
-### 2. Create the card in your event handler
+## Available Card Builders
+
+canvas-forge ships with **9 built-in card builders**:
+
+| Builder | Use Case |
+|---|---|
+| `WelcomeCardBuilder` | Welcome new members |
+| `LeaveCardBuilder` | Say goodbye to departing members |
+| `RankCardBuilder` | Display XP/rank with progress bars |
+| `LevelUpCardBuilder` | Level-up notifications |
+| `ProfileCardBuilder` | Detailed user profiles with stats |
+| `BoostCardBuilder` | Server boost notifications |
+| `InfoCardBuilder` | General info cards (like embeds) |
+| `LeaderboardCardBuilder` | Ranked leaderboards |
+| `SpotifyCardBuilder` | Now Playing / music cards |
+
+## Custom Canvas
+
+If the built-in cards don't fit your needs, use `CanvasBuilder` for full creative freedom:
 
 ```typescript
-client.on(Events.GuildMemberAdd, async (member) => {
-  // Build the welcome card
+import { CanvasBuilder } from 'canvas-forge';
+
+const buffer = new CanvasBuilder(800, 400)
+  .setBackground('#1a1a2e')
+  .drawShadow()
+  .drawGradientRect(20, 20, 760, 360, { colors: ['#e94560', '#0f3460'] }, 15)
+  .clearShadow()
+  .setFont(32, 'sans-serif', 'bold')
+  .drawText('Custom Design', 400, 200, '#ffffff', 'center')
+  .drawLine(40, 250, 760, 250, '#e94560', 2)
+  .drawProgressBar(50, 300, 700, 30, 0.75, '#e94560', '#2a2a3e')
+  .toBuffer();
+```
+
+## Using with Discord.js
+
+```typescript
+import { WelcomeCardBuilder } from 'canvas-forge';
+import { AttachmentBuilder, Client, GatewayIntentBits } from 'discord.js';
+
+const client = new Client({ intents: [GatewayIntentBits.GuildMembers] });
+
+client.on('guildMemberAdd', async (member) => {
   const card = await new WelcomeCardBuilder()
     .setAvatar(member.user.displayAvatarURL({ extension: 'png', size: 512 }))
     .setUsername(member.user.username)
@@ -45,46 +88,15 @@ client.on(Events.GuildMemberAdd, async (member) => {
     .setMemberCount(member.guild.memberCount)
     .build();
 
-  // Send it to a channel
-  const channel = member.guild.channels.cache.get('YOUR_CHANNEL_ID');
-  if (channel?.isTextBased()) {
-    const attachment = new AttachmentBuilder(card, { name: 'welcome.png' });
-    await channel.send({
-      content: `Welcome to the server, ${member}!`,
-      files: [attachment],
-    });
-  }
+  const attachment = new AttachmentBuilder(card, { name: 'welcome.png' });
+  const channel = member.guild.systemChannel;
+  if (channel) channel.send({ files: [attachment] });
 });
-```
-
-### 3. Customize it!
-
-```typescript
-const card = await new WelcomeCardBuilder()
-  .setAvatar(member.user.displayAvatarURL({ extension: 'png', size: 512 }))
-  .setUsername(member.user.username)
-  .setGuildName(member.guild.name)
-  .setMemberCount(member.guild.memberCount)
-  // Customization
-  .setTitleText('Welcome aboard!')
-  .setSubtitleText('You are member #{memberCount}')
-  .setTheme('dark')                      // or 'light' or 'custom'
-  .setAvatarBorder('#e94560')            // Pink border
-  .setTitleColor('#e94560')              // Pink title
-  .setBackgroundGradient({               // Gradient background
-    colors: ['#1a1a2e', '#16213e'],
-    direction: 'diagonal',
-  })
-  .setOverlay('#000000', 0.2)           // Subtle dark overlay
-  .setOutputFormat('png')               // PNG, JPEG, or WebP
-  .build();
 ```
 
 ## Next Steps
 
-- 📖 [API Reference](./api-reference.md) — Full documentation of every class and method
-- 🎴 [Welcome Card Guide](./cards/welcome-card.md)
-- 🏆 [Rank Card Guide](./cards/rank-card.md)
-- ⬆️ [Level Up Card Guide](./cards/level-up-card.md)
-- 👤 [Profile Card Guide](./cards/profile-card.md)
-- 🎨 [Custom Canvas Guide](./custom-canvas.md)
+- Check the [API Reference](./api-reference.md) for all methods and options
+- Browse the [examples](../examples/) directory for more code samples
+- Read the individual card docs in the [cards](./cards/) directory
+- Try building a [Custom Canvas](./custom-canvas.md) from scratch

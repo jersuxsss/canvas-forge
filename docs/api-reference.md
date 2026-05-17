@@ -1,177 +1,225 @@
 # API Reference
 
-Complete API reference for canvas-forge.
+Complete API documentation for canvas-forge.
+
+## Table of Contents
+
+- [Card Builders](#card-builders)
+  - [WelcomeCardBuilder](#welcomecardbuilder)
+  - [LeaveCardBuilder](#leavecardbuilder)
+  - [RankCardBuilder](#rankcardbuilder)
+  - [LevelUpCardBuilder](#levelupcardbuilder)
+  - [ProfileCardBuilder](#profilecardbuilder)
+  - [BoostCardBuilder](#boostcardbuilder)
+  - [InfoCardBuilder](#infocardbuilder)
+  - [LeaderboardCardBuilder](#leaderboardcardbuilder)
+  - [SpotifyCardBuilder](#spotifycardbuilder)
+- [CanvasBuilder](#canvasbuilder)
+- [Utilities](#utilities)
+- [Types](#types)
 
 ---
 
 ## Card Builders
 
+All card builders extend `BaseCanvas` and share these common methods:
+
+| Method | Description |
+|---|---|
+| `setSize(width, height)` | Set canvas dimensions |
+| `setBackground(color)` | Set solid background color |
+| `setBackgroundGradient(gradient)` | Set gradient background |
+| `setBackgroundImage(image)` | Set image background |
+| `setOverlay(color, opacity)` | Apply overlay on top of background |
+| `setOutputFormat(format)` | Output format: `'png'`, `'jpeg'`, `'webp'` |
+| `setQuality(quality)` | JPEG/WebP quality (1-100) |
+| `registerFont(path, name)` | Register a custom font file |
+| `build()` | Build and return the card as a Buffer |
+
 ### WelcomeCardBuilder
 
-Creates welcome cards for new Discord server members.
-
-| Method | Parameters | Returns | Description |
-|---|---|---|---|
-| `setAvatar()` | `source: ImageResolvable` | `this` | Set the user's avatar image |
-| `setAvatarSize()` | `size: number` | `this` | Set avatar diameter in pixels |
-| `setAvatarBorder()` | `color: ColorResolvable` | `this` | Set avatar border color |
-| `setAvatarBorderWidth()` | `width: number` | `this` | Set avatar border width in pixels |
-| `setUsername()` | `username: string` | `this` | Set the username text |
-| `setDiscriminator()` | `discriminator: string` | `this` | Set the discriminator (e.g., '0001') |
-| `setGuildName()` | `name: string` | `this` | Set the server name |
-| `setMemberCount()` | `count: number` | `this` | Set the member count |
-| `setTitleText()` | `text: string` | `this` | Set the title (e.g., 'Welcome!') |
-| `setSubtitleText()` | `text: string` | `this` | Set subtitle (use `{memberCount}` placeholder) |
-| `setTitleColor()` | `color: ColorResolvable` | `this` | Set title text color |
-| `setSubtitleColor()` | `color: ColorResolvable` | `this` | Set subtitle text color |
-| `setUsernameColor()` | `color: ColorResolvable` | `this` | Set username text color |
-| `setTheme()` | `theme: ThemeMode` | `this` | Set color theme ('dark', 'light', 'custom') |
-| `setBackground()` | `color: ColorResolvable` | `this` | Set solid background color |
-| `setBackgroundGradient()` | `gradient: GradientData` | `this` | Set gradient background |
-| `setBackgroundImage()` | `image: ImageResolvable` | `this` | Set background image |
-| `setOverlay()` | `color, opacity` | `this` | Add overlay on top of background |
-| `setSize()` | `width, height` | `this` | Set canvas dimensions |
-| `setOutputFormat()` | `format: OutputFormat` | `this` | Set output format (png, jpeg, webp) |
-| `setQuality()` | `quality: number` | `this` | Set JPEG/WebP quality (1-100) |
-| `registerFont()` | `path, nameAlias` | `this` | Register a custom font |
-| `build()` | — | `Promise<Buffer>` | Build and return the image buffer |
+See [Welcome Card docs](./cards/welcome-card.md).
 
 ### LeaveCardBuilder
 
-Same API as WelcomeCardBuilder but with leave-themed defaults. Does not include `setMemberCount()`.
+See [Leave Card docs](./cards/leave-card.md).
 
 ### RankCardBuilder
 
-Creates XP/rank cards with progress bars.
-
-| Method | Parameters | Returns | Description |
-|---|---|---|---|
-| *All avatar methods from WelcomeCardBuilder* | | | |
-| `setUsername()` | `username: string` | `this` | Set username |
-| `setLevel()` | `level: number` | `this` | Set current level |
-| `setCurrentXP()` | `xp: number` | `this` | Set current XP amount |
-| `setRequiredXP()` | `xp: number` | `this` | Set XP for next level |
-| `setRank()` | `rank: number` | `this` | Set leaderboard rank |
-| `setProgressBarColor()` | `color: ColorResolvable` | `this` | Set progress bar fill color |
-| `setProgressBarTrackColor()` | `color: ColorResolvable` | `this` | Set progress bar track color |
-| `setProgressBarHeight()` | `height: number` | `this` | Set progress bar height |
-| `setStatus()` | `status: StatusType` | `this` | Set status indicator |
-| `setStatusColor()` | `color: ColorResolvable` | `this` | Override status color |
-| `setLevelColor()` | `color: ColorResolvable` | `this` | Set level text color |
-| `setXPColor()` | `color: ColorResolvable` | `this` | Set XP text color |
-| `setRankColor()` | `color: ColorResolvable` | `this` | Set rank text color |
+See [Rank Card docs](./cards/rank-card.md).
 
 ### LevelUpCardBuilder
 
-Creates compact level-up notification cards.
-
-| Method | Parameters | Returns | Description |
-|---|---|---|---|
-| `setAvatar()` | `source: ImageResolvable` | `this` | Set avatar |
-| `setUsername()` | `username: string` | `this` | Set username |
-| `setLevel()` | `level: number` | `this` | Set new level |
-| `setTitleText()` | `text: string` | `this` | Set title (e.g., 'Level Up!') |
-| `setTitleColor()` | `color: ColorResolvable` | `this` | Set title color |
-| `setLevelColor()` | `color: ColorResolvable` | `this` | Set level color |
+See [Level Up Card docs](./cards/level-up-card.md).
 
 ### ProfileCardBuilder
 
-Creates detailed user profile cards.
+See [Profile Card docs](./cards/profile-card.md).
 
-*Includes all methods from RankCardBuilder, plus:*
+### BoostCardBuilder
 
-| Method | Parameters | Returns | Description |
-|---|---|---|---|
-| `setDisplayName()` | `name: string` | `this` | Set display name / nickname |
-| `setBio()` | `bio: string` | `this` | Set bio/description (max 3 lines) |
-| `setBadges()` | `badges: BadgeData[]` | `this` | Set user badges |
-| `setReputation()` | `rep: number` | `this` | Set reputation/points |
-| `setJoinedAt()` | `date: Date \| string` | `this` | Set join date |
-| `setAccentColor()` | `color: ColorResolvable` | `this` | Set accent color |
-| `setBioColor()` | `color: ColorResolvable` | `this` | Set bio text color |
-| `setBioAlign()` | `align: TextAlign` | `this` | Set bio alignment |
+See [Boost Card docs](./cards/boost-card.md). Server boost notification cards with Nitro-themed gradients.
+
+### InfoCardBuilder
+
+See [Info Card docs](./cards/info-card.md). General-purpose info cards with title, description, fields, and footer.
+
+### LeaderboardCardBuilder
+
+See [Leaderboard Card docs](./cards/leaderboard-card.md). Ranked leaderboard cards with medals, avatars, and scores.
+
+### SpotifyCardBuilder
+
+See [Spotify Card docs](./cards/spotify-card.md). Music "Now Playing" cards with album art, progress bar, and timestamps.
 
 ---
 
 ## CanvasBuilder
 
-Freeform canvas for custom designs. See [Custom Canvas Guide](./custom-canvas.md).
+A freeform canvas builder for creating completely custom designs. Wraps `@napi-rs/canvas` with a friendlier, chainable API.
+
+### Constructor
+
+```typescript
+new CanvasBuilder(width: number, height: number)
+```
+
+### Properties
+
+| Property | Type | Description |
+|---|---|---|
+| `width` | `number` | Canvas width |
+| `height` | `number` | Canvas height |
+
+### Background Methods
+
+| Method | Description |
+|---|---|
+| `setBackground(color)` | Fill canvas with solid color |
+| `setBackgroundGradient(gradient)` | Fill canvas with gradient |
+| `setBackgroundImage(source)` | Draw background image (async) |
+
+### Drawing Methods
+
+| Method | Description |
+|---|---|
+| `drawRect(x, y, w, h, color, radius?)` | Draw filled rectangle (optionally rounded) |
+| `drawCircleShape(x, y, radius, color)` | Draw filled circle |
+| `drawImage(source, x, y, w?, h?)` | Draw image (async) |
+| `drawCircularImage(source, x, y, size)` | Draw circular-clipped image (async) |
+| `drawLine(x1, y1, x2, y2, color, lineWidth?)` | Draw straight line |
+| `drawPolygon(points, color, stroke?, strokeWidth?)` | Draw filled polygon |
+| `drawGradientRect(x, y, w, h, gradient, radius?)` | Draw gradient-filled rectangle |
+| `drawBorderedRect(x, y, w, h, color, lineWidth?, radius?)` | Draw bordered rectangle (stroke only) |
+| `drawArc(x, y, radius, startAngle, endAngle, color, lineWidth?)` | Draw arc / partial circle |
+| `drawProgressBar(x, y, w, h, progress, fill, track, radius?)` | Draw progress bar |
+
+### Text Methods
+
+| Method | Description |
+|---|---|
+| `setFont(size, family?, weight?)` | Set current font |
+| `drawText(text, x, y, color, align?)` | Draw text |
+| `drawWrappedText(text, x, y, color, maxWidth, lineHeight?)` | Draw wrapped text |
+
+### State Methods
+
+| Method | Description |
+|---|---|
+| `drawShadow(color?, blur?, offsetX?, offsetY?)` | Enable shadow |
+| `clearShadow()` | Disable shadow |
+| `setGlobalAlpha(alpha)` | Set global transparency (0.0-1.0) |
+| `resetGlobalAlpha()` | Reset transparency to 1.0 |
+| `save()` | Save canvas state |
+| `restore()` | Restore canvas state |
+
+### Output Methods
+
+| Method | Description |
+|---|---|
+| `setOutputFormat(format)` | Set output format |
+| `setOutputQuality(quality)` | Set JPEG/WebP quality |
+| `toBuffer()` | Encode and return Buffer |
+| `getContext()` | Get raw 2D context |
+| `registerFont(path, name)` | Register custom font |
+
+---
+
+## Utilities
+
+### Color Utilities
+
+```typescript
+import { resolveColor, hexToRgba, rgbaToHex, darken, lighten, withOpacity, isHexColor } from 'canvas-forge';
+```
+
+| Function | Description |
+|---|---|
+| `resolveColor(color)` | Convert ColorResolvable to CSS string |
+| `hexToRgba(hex)` | Parse hex to RGBA object |
+| `rgbaToHex(r, g, b, a?)` | Convert RGBA to hex string |
+| `darken(color, amount)` | Darken a color by percentage |
+| `lighten(color, amount)` | Lighten a color by percentage |
+| `withOpacity(color, opacity)` | Apply opacity to a color |
+| `isHexColor(string)` | Check if string is valid hex color |
+
+### Text Utilities
+
+```typescript
+import { formatNumber, formatRank, buildFontString, wrapText, truncateText, measureText } from 'canvas-forge';
+```
+
+| Function | Description |
+|---|---|
+| `formatNumber(num)` | Format number (1500 → '1.5K') |
+| `formatRank(num, prefix?)` | Format rank ('#3') |
+| `buildFontString(size, family?, weight?)` | Build CSS font string |
+| `wrapText(ctx, text, maxWidth)` | Wrap text into lines |
+| `truncateText(ctx, text, maxWidth, suffix?)` | Truncate with ellipsis |
+| `measureText(ctx, text)` | Measure text dimensions |
+
+### Shape Utilities
+
+```typescript
+import { drawRoundedRect, drawCircle, drawProgressBar, drawCircularProgress } from 'canvas-forge';
+```
+
+### Constants
+
+```typescript
+import { DiscordColors, StatusColors, DefaultDimensions } from 'canvas-forge';
+```
 
 ---
 
 ## Types
 
-### ColorResolvable
-```typescript
-type ColorResolvable = string | [r, g, b] | [r, g, b, a];
-```
+### Core Types
 
-### ImageResolvable
-```typescript
-type ImageResolvable = string | Buffer | URL;
-```
+| Type | Description |
+|---|---|
+| `ColorResolvable` | `string \| [r, g, b] \| [r, g, b, a]` |
+| `ImageResolvable` | `string \| Buffer \| URL` |
+| `ThemeMode` | `'dark' \| 'light' \| 'custom'` |
+| `StatusType` | `'online' \| 'idle' \| 'dnd' \| 'offline' \| 'streaming'` |
+| `OutputFormat` | `'png' \| 'jpeg' \| 'webp'` |
+| `GradientData` | `{ colors: ColorResolvable[], direction?: GradientDirection }` |
+| `GradientDirection` | `'horizontal' \| 'vertical' \| 'diagonal' \| 'radial'` |
 
-### ThemeMode
-```typescript
-type ThemeMode = 'dark' | 'light' | 'custom';
-```
+### Card Config Types
 
-### StatusType
-```typescript
-type StatusType = 'online' | 'idle' | 'dnd' | 'offline' | 'streaming';
-```
-
-### OutputFormat
-```typescript
-type OutputFormat = 'png' | 'jpeg' | 'webp';
-```
-
-### GradientData
-```typescript
-interface GradientData {
-  colors: ColorResolvable[];
-  direction?: 'horizontal' | 'vertical' | 'diagonal' | 'radial';
-}
-```
-
-### BadgeData
-```typescript
-interface BadgeData {
-  icon: ImageResolvable;
-  label: string;
-}
-```
-
----
-
-## Constants
-
-### DiscordColors
-```typescript
-DiscordColors.BLURPLE     // '#5865F2'
-DiscordColors.GREEN       // '#57F287'
-DiscordColors.YELLOW      // '#FEE75C'
-DiscordColors.FUCHSIA     // '#EB459E'
-DiscordColors.RED         // '#ED4245'
-DiscordColors.WHITE       // '#FFFFFF'
-DiscordColors.BLACK       // '#23272A'
-DiscordColors.GREYPLE     // '#99AAB5'
-```
-
-### StatusColors
-```typescript
-StatusColors.online    // '#43b581'
-StatusColors.idle      // '#faa61a'
-StatusColors.dnd       // '#f04747'
-StatusColors.offline   // '#747f8d'
-StatusColors.streaming // '#593695'
-```
-
-### DefaultDimensions
-```typescript
-DefaultDimensions.WELCOME   // { width: 1024, height: 450 }
-DefaultDimensions.LEAVE     // { width: 1024, height: 450 }
-DefaultDimensions.RANK      // { width: 934, height: 282 }
-DefaultDimensions.LEVEL_UP  // { width: 600, height: 200 }
-DefaultDimensions.PROFILE   // { width: 800, height: 600 }
-```
+| Type | Description |
+|---|---|
+| `BaseCardConfig` | Base configuration shared by all cards |
+| `WelcomeCardConfig` | Welcome card configuration |
+| `LeaveCardConfig` | Leave card configuration |
+| `RankCardConfig` | Rank card configuration |
+| `LevelUpCardConfig` | Level-up card configuration |
+| `ProfileCardConfig` | Profile card configuration |
+| `BoostCardConfig` | Boost card configuration |
+| `InfoCardConfig` | Info card configuration |
+| `InfoFieldData` | Info card field `{ name, value, inline? }` |
+| `LeaderboardCardConfig` | Leaderboard card configuration |
+| `LeaderboardEntry` | Leaderboard entry `{ rank, username, score, avatar? }` |
+| `SpotifyCardConfig` | Spotify card configuration |
+| `BadgeData` | Profile badge `{ icon, label }` |

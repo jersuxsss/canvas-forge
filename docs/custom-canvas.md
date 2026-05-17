@@ -1,98 +1,188 @@
 # Custom Canvas Guide
 
-The `CanvasBuilder` gives you complete creative freedom to build any design you can imagine.
+The `CanvasBuilder` gives you full creative freedom to design anything from scratch. It wraps the `@napi-rs/canvas` API with a friendlier, chainable interface.
 
-## Basic Usage
+## Basic Setup
 
 ```typescript
 import { CanvasBuilder } from 'canvas-forge';
 
-const buffer = new CanvasBuilder(800, 400)
-  .setBackground('#1a1a2e')
-  .setFont(32, 'sans-serif', 'bold')
-  .drawText('Hello World!', 400, 200, '#e94560', 'center')
-  .toBuffer();
+const canvas = new CanvasBuilder(800, 400);
+```
+
+## Background
+
+```typescript
+// Solid color
+canvas.setBackground('#1a1a2e');
+
+// Gradient
+canvas.setBackgroundGradient({
+  colors: ['#e94560', '#0f3460'],
+  direction: 'horizontal',
+});
+
+// Image (async)
+await canvas.setBackgroundImage('https://example.com/bg.png');
 ```
 
 ## Drawing Shapes
 
 ```typescript
-const builder = new CanvasBuilder(800, 400)
-  .setBackground('#1a1a2e')
-  // Rectangles (with optional rounded corners)
-  .drawRect(20, 20, 200, 100, '#16213e', 15)
-  // Circles
-  .drawCircleShape(500, 200, 80, '#e94560');
+// Rectangle (optionally rounded)
+canvas.drawRect(10, 10, 200, 100, '#ff0000');
+canvas.drawRect(10, 10, 200, 100, '#ff0000', 15); // rounded
+
+// Circle
+canvas.drawCircleShape(100, 100, 50, '#e94560');
+
+// Gradient rectangle (optionally rounded)
+canvas.drawGradientRect(20, 20, 300, 150, {
+  colors: ['#e94560', '#0f3460'],
+  direction: 'diagonal',
+}, 10);
+
+// Bordered rectangle (stroke only, no fill)
+canvas.drawBorderedRect(50, 50, 200, 100, '#ffffff', 3, 8);
+
+// Line
+canvas.drawLine(0, 200, 800, 200, '#ffffff', 2);
+
+// Polygon (triangle, diamond, any shape)
+canvas.drawPolygon(
+  [[400, 50], [500, 200], [300, 200]],
+  '#5865F2',
+);
+
+// Polygon with stroke
+canvas.drawPolygon(
+  [[400, 50], [500, 200], [300, 200]],
+  '#5865F2', '#ffffff', 2,
+);
+
+// Arc (partial circle)
+canvas.drawArc(400, 200, 80, 0, Math.PI, '#e94560', 3);
+
+// Progress bar
+canvas.drawProgressBar(50, 300, 700, 30, 0.75, '#e94560', '#2a2a3e');
 ```
 
 ## Drawing Images
 
 ```typescript
-const builder = new CanvasBuilder(800, 400);
-await builder.setBackgroundImage('https://example.com/bg.png');
-await builder.drawImage('https://example.com/icon.png', 10, 10, 64, 64);
-await builder.drawCircularImage('https://cdn.discordapp.com/avatars/...', 400, 200, 120);
-const buffer = builder.toBuffer();
+// Regular image
+await canvas.drawImage('https://example.com/image.png', 0, 0, 100, 100);
+
+// Circular (clipped) image — perfect for avatars
+await canvas.drawCircularImage('https://example.com/avatar.png', 100, 100, 80);
 ```
 
-## Text
+## Drawing Text
 
 ```typescript
-const builder = new CanvasBuilder(800, 400)
-  .setBackground('#1a1a2e')
-  .setFont(24, 'sans-serif', 'bold')
-  .drawText('Title', 400, 50, '#ffffff', 'center')
-  .setFont(16, 'sans-serif', 'normal')
-  .drawWrappedText(
-    'This is a long paragraph that will automatically wrap to the next line.',
-    50, 100, '#a0a0b0', 700
-  );
+// Set font
+canvas.setFont(32, 'sans-serif', 'bold');
+
+// Simple text
+canvas.drawText('Hello World', 400, 50, '#ffffff', 'center');
+
+// Wrapped text (auto line-break)
+canvas.drawWrappedText(
+  'This is a long text that will automatically wrap',
+  50, 100, '#ffffff', 300,
+);
 ```
 
-## Progress Bars
+## Shadows
 
 ```typescript
-const builder = new CanvasBuilder(800, 100)
-  .setBackground('#1a1a2e')
-  .drawProgressBar(50, 35, 700, 30, 0.75, '#e94560', '#2a2a3e', 15);
+// Enable shadow
+canvas.drawShadow('rgba(0,0,0,0.5)', 10, 4, 4);
+canvas.drawRect(50, 50, 200, 100, '#e94560', 10);
+
+// Disable shadow
+canvas.clearShadow();
 ```
 
-## Raw Context Access
-
-For advanced operations not covered by the builder API:
+## Transparency
 
 ```typescript
-const builder = new CanvasBuilder(800, 400);
-const ctx = builder.getContext();
+// Set transparency (0.0 = invisible, 1.0 = opaque)
+canvas.setGlobalAlpha(0.5);
+canvas.drawRect(0, 0, 800, 400, '#ff0000');
+canvas.resetGlobalAlpha();
+```
 
-// Use the raw @napi-rs/canvas API
-ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
-ctx.shadowBlur = 10;
+## State Management
+
+```typescript
+// Save current state (styles, transforms, clip regions)
+canvas.save();
+
+// ... make changes ...
+canvas.setGlobalAlpha(0.3);
+canvas.drawRect(0, 0, 100, 100, '#ff0000');
+
+// Restore previous state
+canvas.restore();
+// Alpha is back to 1.0
+```
+
+## Advanced: Raw Context
+
+For operations not covered by the builder API, access the raw canvas 2D context:
+
+```typescript
+const ctx = canvas.getContext();
+ctx.beginPath();
+ctx.arc(200, 200, 50, 0, Math.PI * 2);
 ctx.fillStyle = '#e94560';
-ctx.fillRect(100, 100, 200, 200);
-
-const buffer = builder.toBuffer();
+ctx.fill();
 ```
 
-## Custom Fonts
+## Output
 
 ```typescript
-const builder = new CanvasBuilder(800, 400)
-  .registerFont('./fonts/Montserrat-Bold.ttf', 'Montserrat')
-  .setBackground('#1a1a2e')
-  .setFont(32, 'Montserrat', 'bold')
-  .drawText('Custom Font!', 400, 200, '#e94560', 'center');
-```
-
-## Output Formats
-
-```typescript
-// PNG (default)
-const png = builder.toBuffer();
+// Default: PNG
+const buffer = canvas.toBuffer();
 
 // JPEG
-const jpeg = builder.setOutputFormat('jpeg').setOutputQuality(90).toBuffer();
+canvas.setOutputFormat('jpeg');
+canvas.setOutputQuality(90);
+const jpegBuffer = canvas.toBuffer();
 
 // WebP
-const webp = builder.setOutputFormat('webp').setOutputQuality(85).toBuffer();
+canvas.setOutputFormat('webp');
+canvas.setOutputQuality(85);
+const webpBuffer = canvas.toBuffer();
+```
+
+## Full Example
+
+```typescript
+import { CanvasBuilder } from 'canvas-forge';
+import fs from 'fs';
+
+const buffer = new CanvasBuilder(800, 400)
+  .setBackground('#1a1a2e')
+  .drawShadow('rgba(0,0,0,0.3)', 8, 3, 3)
+  .drawGradientRect(20, 20, 760, 360, {
+    colors: ['#16213e', '#0f3460'],
+    direction: 'diagonal',
+  }, 15)
+  .clearShadow()
+  .drawLine(40, 70, 760, 70, 'rgba(255,255,255,0.1)', 1)
+  .setFont(36, 'sans-serif', 'bold')
+  .drawText('My Custom Card', 400, 55, '#e94560', 'center')
+  .drawPolygon(
+    [[400, 100], [480, 180], [400, 260], [320, 180]],
+    '#5865F2',
+  )
+  .setFont(16, 'sans-serif', 'normal')
+  .drawText('Built with canvas-forge', 400, 300, '#a0a0b0', 'center')
+  .drawProgressBar(50, 330, 700, 20, 0.85, '#e94560', '#2a2a3e', 10)
+  .drawBorderedRect(40, 80, 720, 260, 'rgba(255,255,255,0.05)', 1, 10)
+  .toBuffer();
+
+fs.writeFileSync('custom.png', buffer);
 ```

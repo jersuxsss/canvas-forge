@@ -181,4 +181,8 @@ export const DefaultDimensions = {
   RANK: { width: 934, height: 282 },
   LEVEL_UP: { width: 600, height: 200 },
   PROFILE: { width: 800, height: 600 },
+  BOOST: { width: 800, height: 320 },
+  INFO: { width: 800, height: 400 },
+  LEADERBOARD: { width: 800, height: 600 },
+  SPOTIFY: { width: 800, height: 250 },
 } as const;

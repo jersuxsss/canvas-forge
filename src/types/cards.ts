@@ -263,3 +263,177 @@ export interface ProfileCardConfig extends BaseCardConfig {
   /** Color theme. */
   theme: ThemeMode;
 }
+
+// ---------------------------------------------------------------------------
+// Boost Card
+// ---------------------------------------------------------------------------
+
+/**
+ * Configuration for the Boost Card builder.
+ */
+export interface BoostCardConfig extends BaseCardConfig {
+  /** URL, path, or Buffer of the user's avatar image. */
+  avatar: ImageResolvable | null;
+  /** Size of the avatar in pixels. */
+  avatarSize: number;
+  /** Border color around the avatar. */
+  avatarBorderColor: ColorResolvable;
+  /** Border width around the avatar in pixels. */
+  avatarBorderWidth: number;
+  /** The username to display. */
+  username: string;
+  /** The guild/server name. */
+  guildName: string;
+  /** How many boosts the server now has. */
+  boostCount: number;
+  /** Title text (e.g., 'Server Boosted!'). */
+  titleText: string;
+  /** Subtitle text template. Use {boostCount} as a placeholder. */
+  subtitleText: string;
+  /** Color of the title text. */
+  titleColor: ColorResolvable;
+  /** Color of the subtitle text. */
+  subtitleColor: ColorResolvable;
+  /** Color of the username text. */
+  usernameColor: ColorResolvable;
+  /** Accent / highlight color (boost glow). */
+  accentColor: ColorResolvable;
+  /** Color theme. */
+  theme: ThemeMode;
+}
+
+// ---------------------------------------------------------------------------
+// Info Card
+// ---------------------------------------------------------------------------
+
+/**
+ * A field displayed on the info card (similar to Discord embed fields).
+ */
+export interface InfoFieldData {
+  /** Field name/title. */
+  name: string;
+  /** Field value/content. */
+  value: string;
+  /** Whether this field is inline (side-by-side with other fields). */
+  inline?: boolean;
+}
+
+/**
+ * Configuration for the Info Card builder.
+ */
+export interface InfoCardConfig extends BaseCardConfig {
+  /** Title text of the info card. */
+  title: string;
+  /** Description / body text. */
+  description: string;
+  /** Structured fields displayed in a grid. */
+  fields: InfoFieldData[];
+  /** Footer text (e.g., timestamp, credits). */
+  footer: string;
+  /** Optional icon image (top-left). */
+  icon: ImageResolvable | null;
+  /** Size of the icon in pixels. */
+  iconSize: number;
+  /** Color of the title text. */
+  titleColor: ColorResolvable;
+  /** Color of the description text. */
+  descriptionColor: ColorResolvable;
+  /** Color of the field names/labels. */
+  fieldNameColor: ColorResolvable;
+  /** Color of the field values. */
+  fieldValueColor: ColorResolvable;
+  /** Color of the footer text. */
+  footerColor: ColorResolvable;
+  /** Left accent stripe color. */
+  accentColor: ColorResolvable;
+  /** Color theme. */
+  theme: ThemeMode;
+}
+
+// ---------------------------------------------------------------------------
+// Leaderboard Card
+// ---------------------------------------------------------------------------
+
+/**
+ * A single entry on the leaderboard.
+ */
+export interface LeaderboardEntry {
+  /** Rank position (1, 2, 3, …). */
+  rank: number;
+  /** The username to display. */
+  username: string;
+  /** The user's score or value (XP, coins, etc.). */
+  score: number;
+  /** Optional avatar image. */
+  avatar?: ImageResolvable;
+}
+
+/**
+ * Configuration for the Leaderboard Card builder.
+ */
+export interface LeaderboardCardConfig extends BaseCardConfig {
+  /** Title text (e.g., 'XP Leaderboard'). */
+  title: string;
+  /** Array of leaderboard entries (users). */
+  entries: LeaderboardEntry[];
+  /** Maximum entries to display. Defaults to 10. */
+  maxEntries: number;
+  /** Label for the score column (e.g., 'XP', 'Coins'). */
+  scoreLabel: string;
+  /** Color of the title text. */
+  titleColor: ColorResolvable;
+  /** Color of the username text. */
+  usernameColor: ColorResolvable;
+  /** Color of the score text. */
+  scoreColor: ColorResolvable;
+  /** Accent color for top-3 highlights. */
+  accentColor: ColorResolvable;
+  /** Color of divider lines. */
+  dividerColor: ColorResolvable;
+  /** Color of the rank number. */
+  rankColor: ColorResolvable;
+  /** Color theme. */
+  theme: ThemeMode;
+}
+
+// ---------------------------------------------------------------------------
+// Spotify / Now Playing Card
+// ---------------------------------------------------------------------------
+
+/**
+ * Configuration for the Spotify / Now Playing card builder.
+ */
+export interface SpotifyCardConfig extends BaseCardConfig {
+  /** Song / track title. */
+  songTitle: string;
+  /** Artist name(s). */
+  artist: string;
+  /** Album name. */
+  album: string;
+  /** Album art / cover image. */
+  albumArt: ImageResolvable | null;
+  /** Size of the album art in pixels. */
+  albumArtSize: number;
+  /** Elapsed time in milliseconds. */
+  elapsed: number;
+  /** Total duration in milliseconds. */
+  duration: number;
+  /** Whether the track is currently playing. */
+  isPlaying: boolean;
+  /** Color of the song title text. */
+  titleColor: ColorResolvable;
+  /** Color of the artist text. */
+  artistColor: ColorResolvable;
+  /** Color of the album text. */
+  albumColor: ColorResolvable;
+  /** Color of the progress bar fill. */
+  progressBarColor: ColorResolvable;
+  /** Color of the progress bar track. */
+  progressBarTrackColor: ColorResolvable;
+  /** Color of the timestamps. */
+  timestampColor: ColorResolvable;
+  /** Accent color. */
+  accentColor: ColorResolvable;
+  /** Color theme. */
+  theme: ThemeMode;
+}

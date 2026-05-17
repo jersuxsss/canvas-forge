@@ -3,8 +3,9 @@
  *
  * Built on @napi-rs/canvas (Skia engine) for maximum speed with zero
  * system dependencies. Provides ready-to-use card builders for common
- * Discord bot needs (welcome, leave, rank, level-up, profile) plus a
- * freeform CanvasBuilder for completely custom designs.
+ * Discord bot needs (welcome, leave, rank, level-up, profile, boost,
+ * info, leaderboard, spotify) plus a freeform CanvasBuilder for
+ * completely custom designs.
  *
  * @packageDocumentation
  * @module canvas-forge
@@ -45,6 +46,10 @@ export { LeaveCardBuilder } from './cards/LeaveCardBuilder';
 export { RankCardBuilder } from './cards/RankCardBuilder';
 export { LevelUpCardBuilder } from './cards/LevelUpCardBuilder';
 export { ProfileCardBuilder } from './cards/ProfileCardBuilder';
+export { BoostCardBuilder } from './cards/BoostCardBuilder';
+export { InfoCardBuilder } from './cards/InfoCardBuilder';
+export { LeaderboardCardBuilder } from './cards/LeaderboardCardBuilder';
+export { SpotifyCardBuilder } from './cards/SpotifyCardBuilder';
 
 // ── Core ───────────────────────────────────────────────────────────────────
 export { CanvasBuilder } from './core/CanvasBuilder';
@@ -122,6 +127,12 @@ export type {
   LevelUpCardConfig,
   BadgeData,
   ProfileCardConfig,
+  BoostCardConfig,
+  InfoCardConfig,
+  InfoFieldData,
+  LeaderboardCardConfig,
+  LeaderboardEntry,
+  SpotifyCardConfig,
 } from './types/cards';
 
 // ── Re-export color types from utils ───────────────────────────────────────

@@ -158,4 +158,125 @@ describe('CanvasBuilder', () => {
     expect(buffer).toBeInstanceOf(Buffer);
     expect(buffer.length).toBeGreaterThan(0);
   });
+
+  // ── New methods (v1.1.0) ──
+
+  it('should draw lines', () => {
+    const builder = new CanvasBuilder(200, 200);
+    const result = builder.drawLine(0, 0, 200, 200, '#ff0000', 3);
+    expect(result).toBe(builder);
+  });
+
+  it('should draw polygons', () => {
+    const builder = new CanvasBuilder(200, 200);
+    const result = builder.drawPolygon(
+      [[100, 10], [190, 190], [10, 190]],
+      '#ff0000',
+    );
+    expect(result).toBe(builder);
+  });
+
+  it('should draw polygons with stroke', () => {
+    const builder = new CanvasBuilder(200, 200);
+    const result = builder.drawPolygon(
+      [[100, 10], [190, 190], [10, 190]],
+      '#ff0000', '#ffffff', 2,
+    );
+    expect(result).toBe(builder);
+  });
+
+  it('should skip polygons with fewer than 3 points', () => {
+    const builder = new CanvasBuilder(200, 200);
+    const result = builder.drawPolygon([[0, 0], [1, 1]], '#ff0000');
+    expect(result).toBe(builder);
+  });
+
+  it('should draw gradient rectangles', () => {
+    const builder = new CanvasBuilder(200, 200);
+    const result = builder.drawGradientRect(10, 10, 180, 180, {
+      colors: ['#e94560', '#0f3460'],
+      direction: 'horizontal',
+    });
+    expect(result).toBe(builder);
+  });
+
+  it('should draw gradient rectangles with radius', () => {
+    const builder = new CanvasBuilder(200, 200);
+    const result = builder.drawGradientRect(10, 10, 180, 180, {
+      colors: ['#e94560', '#0f3460'],
+    }, 15);
+    expect(result).toBe(builder);
+  });
+
+  it('should draw bordered rectangles', () => {
+    const builder = new CanvasBuilder(200, 200);
+    const result = builder.drawBorderedRect(10, 10, 180, 180, '#e94560', 3);
+    expect(result).toBe(builder);
+  });
+
+  it('should draw bordered rectangles with radius', () => {
+    const builder = new CanvasBuilder(200, 200);
+    const result = builder.drawBorderedRect(10, 10, 180, 180, '#e94560', 3, 10);
+    expect(result).toBe(builder);
+  });
+
+  it('should draw arcs', () => {
+    const builder = new CanvasBuilder(200, 200);
+    const result = builder.drawArc(100, 100, 50, 0, Math.PI, '#e94560', 3);
+    expect(result).toBe(builder);
+  });
+
+  it('should manage shadows', () => {
+    const builder = new CanvasBuilder(200, 200);
+    const result = builder
+      .drawShadow('rgba(0,0,0,0.5)', 10, 4, 4)
+      .drawRect(50, 50, 100, 100, '#ff0000')
+      .clearShadow();
+    expect(result).toBe(builder);
+  });
+
+  it('should manage global alpha', () => {
+    const builder = new CanvasBuilder(200, 200);
+    const result = builder
+      .setGlobalAlpha(0.5)
+      .drawRect(0, 0, 200, 200, '#ff0000')
+      .resetGlobalAlpha();
+    expect(result).toBe(builder);
+  });
+
+  it('should clamp global alpha to 0-1', () => {
+    const builder = new CanvasBuilder(200, 200);
+    builder.setGlobalAlpha(2.0); // Should clamp to 1
+    builder.setGlobalAlpha(-1.0); // Should clamp to 0
+    expect(builder).toBeDefined();
+  });
+
+  it('should support save and restore', () => {
+    const builder = new CanvasBuilder(200, 200);
+    const result = builder
+      .save()
+      .setGlobalAlpha(0.5)
+      .drawRect(0, 0, 100, 100, '#ff0000')
+      .restore();
+    expect(result).toBe(builder);
+  });
+
+  it('should chain all new methods together', () => {
+    const buffer = new CanvasBuilder(400, 400)
+      .setBackground('#1a1a2e')
+      .drawShadow()
+      .drawGradientRect(20, 20, 360, 360, { colors: ['#e94560', '#0f3460'] }, 15)
+      .clearShadow()
+      .drawLine(30, 200, 370, 200, '#ffffff', 1)
+      .setGlobalAlpha(0.7)
+      .drawPolygon([[200, 50], [350, 150], [200, 250], [50, 150]], '#5865F2')
+      .resetGlobalAlpha()
+      .drawBorderedRect(50, 300, 300, 50, '#e94560', 2, 8)
+      .drawArc(200, 200, 80, 0, Math.PI * 1.5, '#f47fff', 4)
+      .toBuffer();
+
+    expect(buffer).toBeInstanceOf(Buffer);
+    expect(buffer.length).toBeGreaterThan(0);
+  });
 });
+

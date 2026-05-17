@@ -264,6 +264,212 @@ export class CanvasBuilder {
     return this;
   }
 
+  // ---- Line & shape methods ----
+
+  /**
+   * Draws a straight line between two points.
+   * @param x1 - Start X position.
+   * @param y1 - Start Y position.
+   * @param x2 - End X position.
+   * @param y2 - End Y position.
+   * @param color - Line color.
+   * @param lineWidth - Line width in pixels. Defaults to 2.
+   */
+  public drawLine(
+    x1: number, y1: number, x2: number, y2: number,
+    color: ColorResolvable, lineWidth: number = 2,
+  ): this {
+    this.ctx.beginPath();
+    this.ctx.moveTo(x1, y1);
+    this.ctx.lineTo(x2, y2);
+    this.ctx.strokeStyle = resolveColor(color);
+    this.ctx.lineWidth = lineWidth;
+    this.ctx.stroke();
+    return this;
+  }
+
+  /**
+   * Draws a filled polygon from an array of [x, y] points.
+   * @param points - Array of [x, y] coordinate pairs.
+   * @param color - Fill color.
+   * @param strokeColor - Optional stroke color.
+   * @param strokeWidth - Stroke width. Defaults to 0 (no stroke).
+   */
+  public drawPolygon(
+    points: [number, number][],
+    color: ColorResolvable,
+    strokeColor?: ColorResolvable,
+    strokeWidth: number = 0,
+  ): this {
+    if (points.length < 3) { return this; }
+    this.ctx.beginPath();
+    const first = points[0];
+    if (first) { this.ctx.moveTo(first[0], first[1]); }
+    for (let i = 1; i < points.length; i++) {
+      const pt = points[i];
+      if (pt) { this.ctx.lineTo(pt[0], pt[1]); }
+    }
+    this.ctx.closePath();
+    this.ctx.fillStyle = resolveColor(color);
+    this.ctx.fill();
+    if (strokeColor && strokeWidth > 0) {
+      this.ctx.strokeStyle = resolveColor(strokeColor);
+      this.ctx.lineWidth = strokeWidth;
+      this.ctx.stroke();
+    }
+    return this;
+  }
+
+  /**
+   * Draws a rectangle filled with a gradient.
+   * @param x - X position.
+   * @param y - Y position.
+   * @param width - Width in pixels.
+   * @param height - Height in pixels.
+   * @param gradient - Gradient data with colors and direction.
+   * @param radius - Corner radius. Defaults to 0.
+   */
+  public drawGradientRect(
+    x: number, y: number, width: number, height: number,
+    gradient: GradientData, radius: number = 0,
+  ): this {
+    const coords = getGradientCoords(width, height, gradient.direction);
+    const grad = this.ctx.createLinearGradient(
+      x + coords.x0, y + coords.y0,
+      x + coords.x1, y + coords.y1,
+    );
+    const stops = createGradientStops(gradient);
+    for (const [offset, color] of stops) {
+      grad.addColorStop(offset, color);
+    }
+    if (radius > 0) {
+      this.ctx.save();
+      const r = Math.min(radius, width / 2, height / 2);
+      this.ctx.beginPath();
+      this.ctx.moveTo(x + r, y);
+      this.ctx.lineTo(x + width - r, y);
+      this.ctx.quadraticCurveTo(x + width, y, x + width, y + r);
+      this.ctx.lineTo(x + width, y + height - r);
+      this.ctx.quadraticCurveTo(x + width, y + height, x + width - r, y + height);
+      this.ctx.lineTo(x + r, y + height);
+      this.ctx.quadraticCurveTo(x, y + height, x, y + height - r);
+      this.ctx.lineTo(x, y + r);
+      this.ctx.quadraticCurveTo(x, y, x + r, y);
+      this.ctx.closePath();
+      this.ctx.fillStyle = grad;
+      this.ctx.fill();
+      this.ctx.restore();
+    } else {
+      this.ctx.fillStyle = grad;
+      this.ctx.fillRect(x, y, width, height);
+    }
+    return this;
+  }
+
+  /**
+   * Draws a rectangle with a colored border (stroke only, no fill).
+   * @param x - X position.
+   * @param y - Y position.
+   * @param width - Width in pixels.
+   * @param height - Height in pixels.
+   * @param color - Border color.
+   * @param lineWidth - Border width in pixels. Defaults to 2.
+   * @param radius - Corner radius. Defaults to 0.
+   */
+  public drawBorderedRect(
+    x: number, y: number, width: number, height: number,
+    color: ColorResolvable, lineWidth: number = 2, radius: number = 0,
+  ): this {
+    if (radius > 0) {
+      drawRoundedRect(this.ctx, x, y, width, height, radius, undefined, color);
+      this.ctx.lineWidth = lineWidth;
+    } else {
+      this.ctx.strokeStyle = resolveColor(color);
+      this.ctx.lineWidth = lineWidth;
+      this.ctx.strokeRect(x, y, width, height);
+    }
+    return this;
+  }
+
+  /**
+   * Draws an arc (partial circle / curve).
+   * @param x - Center X position.
+   * @param y - Center Y position.
+   * @param radius - Arc radius.
+   * @param startAngle - Start angle in radians.
+   * @param endAngle - End angle in radians.
+   * @param color - Stroke color.
+   * @param lineWidth - Line width. Defaults to 2.
+   */
+  public drawArc(
+    x: number, y: number, radius: number,
+    startAngle: number, endAngle: number,
+    color: ColorResolvable, lineWidth: number = 2,
+  ): this {
+    this.ctx.beginPath();
+    this.ctx.arc(x, y, radius, startAngle, endAngle);
+    this.ctx.strokeStyle = resolveColor(color);
+    this.ctx.lineWidth = lineWidth;
+    this.ctx.stroke();
+    return this;
+  }
+
+  // ---- State management methods ----
+
+  /**
+   * Enables shadow for all subsequent drawing operations.
+   * @param color - Shadow color. Defaults to 'rgba(0,0,0,0.5)'.
+   * @param blur - Shadow blur radius. Defaults to 10.
+   * @param offsetX - Horizontal shadow offset. Defaults to 4.
+   * @param offsetY - Vertical shadow offset. Defaults to 4.
+   */
+  public drawShadow(
+    color: ColorResolvable = 'rgba(0,0,0,0.5)',
+    blur: number = 10, offsetX: number = 4, offsetY: number = 4,
+  ): this {
+    this.ctx.shadowColor = resolveColor(color);
+    this.ctx.shadowBlur = blur;
+    this.ctx.shadowOffsetX = offsetX;
+    this.ctx.shadowOffsetY = offsetY;
+    return this;
+  }
+
+  /** Clears shadow from subsequent drawing operations. */
+  public clearShadow(): this {
+    this.ctx.shadowColor = 'transparent';
+    this.ctx.shadowBlur = 0;
+    this.ctx.shadowOffsetX = 0;
+    this.ctx.shadowOffsetY = 0;
+    return this;
+  }
+
+  /**
+   * Sets global transparency for all subsequent drawing operations.
+   * @param alpha - Opacity value (0.0 fully transparent to 1.0 fully opaque).
+   */
+  public setGlobalAlpha(alpha: number): this {
+    this.ctx.globalAlpha = Math.max(0, Math.min(1, alpha));
+    return this;
+  }
+
+  /** Resets global transparency back to fully opaque (1.0). */
+  public resetGlobalAlpha(): this {
+    this.ctx.globalAlpha = 1;
+    return this;
+  }
+
+  /** Saves the current canvas state (transforms, styles, clip regions). */
+  public save(): this {
+    this.ctx.save();
+    return this;
+  }
+
+  /** Restores the most recently saved canvas state. */
+  public restore(): this {
+    this.ctx.restore();
+    return this;
+  }
+
   // ---- Output methods ----
 
   /** Sets the output format. */
