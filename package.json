@@ -1,6 +1,7 @@
 {
   "name": "canvas-forge",
   "version": "1.0.0",
+  "type": "module",
   "description": "A high-performance, Discord-focused canvas library with built-in card builders for welcome, rank, level-up, profile cards and more. Built on Skia for speed and zero system dependencies.",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
