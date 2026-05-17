@@ -1,0 +1,25 @@
+# Source code (published via dist/)
+src/
+tests/
+examples/
+docs/
+assets/
+coverage/
+
+# Config files
+.github/
+.eslintrc.cjs
+.prettierrc
+tsconfig.json
+tsup.config.ts
+vitest.config.ts
+.gitignore
+.editorconfig
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db

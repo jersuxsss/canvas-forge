@@ -1,0 +1,83 @@
+{
+  "name": "canvas-forge",
+  "version": "1.0.0",
+  "description": "A high-performance, Discord-focused canvas library with built-in card builders for welcome, rank, level-up, profile cards and more. Built on Skia for speed and zero system dependencies.",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "lint": "eslint src/ tests/ --ext .ts",
+    "format": "prettier --write \"src/**/*.ts\" \"tests/**/*.ts\"",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "npm run lint && npm run typecheck && npm run test && npm run build"
+  },
+  "keywords": [
+    "discord",
+    "canvas",
+    "image",
+    "welcome",
+    "rank",
+    "level",
+    "card",
+    "bot",
+    "discord.js",
+    "skia",
+    "napi",
+    "builder",
+    "profile",
+    "banner",
+    "forge"
+  ],
+  "author": {
+    "name": "jersuxs",
+    "url": "https://github.com/jersuxsss"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jersuxsss/canvas-forge.git"
+  },
+  "bugs": {
+    "url": "https://github.com/jersuxsss/canvas-forge/issues"
+  },
+  "homepage": "https://github.com/jersuxsss/canvas-forge#readme",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "@napi-rs/canvas": "^0.1.65"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.18",
+    "@typescript-eslint/eslint-plugin": "^8.32.1",
+    "@typescript-eslint/parser": "^8.32.1",
+    "eslint": "^8.57.1",
+    "prettier": "^3.5.3",
+    "tsup": "^8.5.0",
+    "typescript": "^5.8.3",
+    "vitest": "^3.1.3"
+  }
+}
