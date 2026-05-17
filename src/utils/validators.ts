@@ -5,7 +5,6 @@
  */
 
 import type { ColorResolvable, ImageResolvable, OutputFormat, StatusType, ThemeMode } from '../types/common';
-import { isHexColor } from './colors';
 
 /**
  * Validates that a value is a positive integer.

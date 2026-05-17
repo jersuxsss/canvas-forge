@@ -3,7 +3,6 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { createCanvas } from '@napi-rs/canvas';
 import { BaseCanvas } from '../../src/core/BaseCanvas';
 import type { BaseCardConfig } from '../../src/types/cards';
 
@@ -24,11 +23,12 @@ class TestCanvas extends BaseCanvas<BaseCardConfig> {
     });
   }
 
-  protected async _render(): Promise<void> {
+  protected _render(): Promise<void> {
     this.renderCalled = true;
     // Draw something simple
     this.ctx.fillStyle = '#ff0000';
     this.ctx.fillRect(10, 10, 50, 50);
+    return Promise.resolve();
   }
 }
 

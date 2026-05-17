@@ -159,9 +159,14 @@ describe('createGradientStops', () => {
   it('should handle 3 colors', () => {
     const stops = createGradientStops({ colors: ['#ff0000', '#00ff00', '#0000ff'] });
     expect(stops).toHaveLength(3);
-    expect(stops[0]![0]).toBe(0);
-    expect(stops[1]![0]).toBe(0.5);
-    expect(stops[2]![0]).toBe(1);
+    const stop0 = stops[0];
+    const stop1 = stops[1];
+    const stop2 = stops[2];
+    if (stop0 && stop1 && stop2) {
+      expect(stop0[0]).toBe(0);
+      expect(stop1[0]).toBe(0.5);
+      expect(stop2[0]).toBe(1);
+    }
   });
 
   it('should throw with fewer than 2 colors', () => {

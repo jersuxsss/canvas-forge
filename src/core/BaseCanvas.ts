@@ -18,7 +18,7 @@ import type {
 } from '../types/common';
 import type { BaseCardConfig } from '../types/cards';
 import { resolveColor, createGradientStops, getGradientCoords } from '../utils/colors';
-import { drawRoundedRect, clipCircle, drawAvatarBorder } from '../utils/shapes';
+import { clipCircle, drawAvatarBorder } from '../utils/shapes';
 import { loadImage } from './ImageLoader';
 import { validateDimensions, validateRange } from '../utils/validators';
 

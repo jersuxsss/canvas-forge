@@ -5,7 +5,7 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { createCanvas } from '@napi-rs/canvas';
+import { createCanvas, type Canvas, type SKRSContext2D } from '@napi-rs/canvas';
 import {
   drawRoundedRect,
   drawCircle,
@@ -17,14 +17,14 @@ import {
 } from '../../src/utils/shapes';
 
 /** Helper to create a canvas and context for testing. */
-function createTestCanvas(width = 200, height = 200) {
+function createTestCanvas(width = 200, height = 200): { canvas: Canvas; ctx: SKRSContext2D } {
   const canvas = createCanvas(width, height);
   const ctx = canvas.getContext('2d');
   return { canvas, ctx };
 }
 
 /** Helper to check that pixels were drawn (not all transparent). */
-function hasContent(canvas: ReturnType<typeof createCanvas>): boolean {
+function hasContent(canvas: Canvas): boolean {
   const buf = canvas.toBuffer('image/png');
   return buf.length > 100; // A blank PNG is ~100 bytes; any drawn content adds more
 }

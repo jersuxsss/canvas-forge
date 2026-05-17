@@ -42,7 +42,9 @@ describe('tryLoadImage', () => {
     const buffer = createTestPngBuffer();
     const img = await tryLoadImage(buffer);
     expect(img).not.toBeNull();
-    expect(img!.width).toBe(1);
+    if (img) {
+      expect(img.width).toBe(1);
+    }
   });
 
   it('should return null for invalid sources', async () => {

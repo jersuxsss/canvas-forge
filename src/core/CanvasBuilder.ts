@@ -13,7 +13,7 @@ import {
 import type { ColorResolvable, GradientData, ImageResolvable, OutputFormat } from '../types/common';
 import { resolveColor, createGradientStops, getGradientCoords } from '../utils/colors';
 import { drawRoundedRect, drawCircle, drawProgressBar, clipCircle } from '../utils/shapes';
-import { wrapText, truncateText, buildFontString } from '../utils/text';
+import { wrapText, buildFontString } from '../utils/text';
 import { loadImage } from './ImageLoader';
 import { validateDimensions } from '../utils/validators';
 
