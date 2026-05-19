@@ -185,4 +185,6 @@ export const DefaultDimensions = {
   INFO: { width: 800, height: 400 },
   LEADERBOARD: { width: 800, height: 600 },
   SPOTIFY: { width: 800, height: 250 },
+  MODERATION: { width: 800, height: 350 },
+  SERVER_STATS: { width: 800, height: 450 },
 } as const;

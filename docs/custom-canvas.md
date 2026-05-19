@@ -128,6 +128,62 @@ canvas.restore();
 // Alpha is back to 1.0
 ```
 
+## Filters & Pixelation
+
+You can apply standard CSS filters or pixelate specific regions:
+
+```typescript
+// Apply a quick grayscale filter to subsequent drawing operations
+canvas.applyGrayscale(100);
+canvas.drawRect(50, 50, 100, 100, '#ff0000'); // Drawn in grayscale
+
+// Apply other filters
+canvas.applyBlur(5); // 5px blur
+canvas.applySepia(100); // 100% sepia
+canvas.applyInvert(100); // 100% invert color
+canvas.setFilter('contrast(150%) hue-rotate(90deg)'); // custom CSS filter
+
+// Reset filters back to none
+canvas.clearFilter();
+
+// Pixelate a specific rectangular region (perfect for hiding avatars or details)
+canvas.pixelate(50, 50, 200, 150, 8); // x, y, width, height, pixelSize (default: 8)
+```
+
+## Drawing Text with Discord Emojis
+
+Draw strings containing inline custom Discord emojis (`<:name:id>` or `<a:name:id>`). The builder automatically fetches the emoji images from Discord's CDN, caches them, and renders them vertically aligned with your text:
+
+```typescript
+// (async) Draws text with custom emojis inline
+await canvas.drawTextWithEmojis(
+  'Welcome to the server! <:boost:1234567890> Enjoy your stay!',
+  400, // X position
+  150, // Y position (baseline)
+  '#ffffff', // Text color
+  'center', // Alignment ('left', 'center', 'right')
+  24, // Optional custom emoji size (defaults to font size)
+);
+```
+
+## Radial Gradients
+
+In addition to linear gradients (`horizontal`, `vertical`, `diagonal`), you can use `radial` gradients for backgrounds and rectangle fills:
+
+```typescript
+// Background radial gradient
+canvas.setBackgroundGradient({
+  colors: ['#2c2f33', '#1a1a2e'],
+  direction: 'radial',
+});
+
+// Rectangle radial gradient fill
+canvas.drawGradientRect(100, 100, 200, 200, {
+  colors: ['#eb459e', '#5865f2'],
+  direction: 'radial',
+});
+```
+
 ## Advanced: Raw Context
 
 For operations not covered by the builder API, access the raw canvas 2D context:

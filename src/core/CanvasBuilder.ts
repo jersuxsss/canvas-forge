@@ -9,12 +9,13 @@ import {
   type Canvas,
   type SKRSContext2D,
   GlobalFonts,
+  type Image,
 } from '@napi-rs/canvas';
 import type { ColorResolvable, GradientData, ImageResolvable, OutputFormat } from '../types/common';
 import { resolveColor, createGradientStops, getGradientCoords } from '../utils/colors';
 import { drawRoundedRect, drawCircle, drawProgressBar, clipCircle } from '../utils/shapes';
-import { wrapText, buildFontString } from '../utils/text';
-import { loadImage } from './ImageLoader';
+import { wrapText, buildFontString, tokenizeEmojiText } from '../utils/text';
+import { loadImage, tryLoadImage } from './ImageLoader';
 import { validateDimensions } from '../utils/validators';
 
 /**
@@ -91,8 +92,16 @@ export class CanvasBuilder {
    * @param gradient - Gradient data with colors and direction.
    */
   public setBackgroundGradient(gradient: GradientData): this {
-    const coords = getGradientCoords(this.width, this.height, gradient.direction);
-    const grad = this.ctx.createLinearGradient(coords.x0, coords.y0, coords.x1, coords.y1);
+    let grad;
+    if (gradient.direction === 'radial') {
+      const cx = this.width / 2;
+      const cy = this.height / 2;
+      const r = Math.max(this.width, this.height) / 2;
+      grad = this.ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
+    } else {
+      const coords = getGradientCoords(this.width, this.height, gradient.direction);
+      grad = this.ctx.createLinearGradient(coords.x0, coords.y0, coords.x1, coords.y1);
+    }
     const stops = createGradientStops(gradient);
     for (const [offset, color] of stops) {
       grad.addColorStop(offset, color);
@@ -333,11 +342,19 @@ export class CanvasBuilder {
     x: number, y: number, width: number, height: number,
     gradient: GradientData, radius: number = 0,
   ): this {
-    const coords = getGradientCoords(width, height, gradient.direction);
-    const grad = this.ctx.createLinearGradient(
-      x + coords.x0, y + coords.y0,
-      x + coords.x1, y + coords.y1,
-    );
+    let grad;
+    if (gradient.direction === 'radial') {
+      const cx = x + width / 2;
+      const cy = y + height / 2;
+      const r = Math.max(width, height) / 2;
+      grad = this.ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
+    } else {
+      const coords = getGradientCoords(width, height, gradient.direction);
+      grad = this.ctx.createLinearGradient(
+        x + coords.x0, y + coords.y0,
+        x + coords.x1, y + coords.y1,
+      );
+    }
     const stops = createGradientStops(gradient);
     for (const [offset, color] of stops) {
       grad.addColorStop(offset, color);
@@ -466,6 +483,160 @@ export class CanvasBuilder {
 
   /** Restores the most recently saved canvas state. */
   public restore(): this {
+    this.ctx.restore();
+    return this;
+  }
+
+  // ---- Filter and Manipulation methods ----
+
+  /**
+   * Sets a native canvas filter string (e.g. "blur(5px) grayscale(100%)").
+   * @param filterString - The CSS filter string.
+   */
+  public setFilter(filterString: string): this {
+    this.ctx.filter = filterString;
+    return this;
+  }
+
+  /** Clears any active canvas filters. */
+  public clearFilter(): this {
+    this.ctx.filter = 'none';
+    return this;
+  }
+
+  /** Applies a quick blur filter. */
+  public applyBlur(pixels: number = 5): this {
+    return this.setFilter(`blur(${pixels}px)`);
+  }
+
+  /** Applies a quick grayscale filter. */
+  public applyGrayscale(percent: number = 100): this {
+    return this.setFilter(`grayscale(${percent}%)`);
+  }
+
+  /** Applies a quick sepia filter. */
+  public applySepia(percent: number = 100): this {
+    return this.setFilter(`sepia(${percent}%)`);
+  }
+
+  /** Applies a quick invert filter. */
+  public applyInvert(percent: number = 100): this {
+    return this.setFilter(`invert(${percent}%)`);
+  }
+
+  /**
+   * Applies a pixelation effect to a rectangular region.
+   * @param x - X position of the region.
+   * @param y - Y position of the region.
+   * @param width - Width of the region.
+   * @param height - Height of the region.
+   * @param pixelSize - Size of each pixel block. Defaults to 8.
+   */
+  public pixelate(x: number, y: number, width: number, height: number, pixelSize: number = 8): this {
+    if (pixelSize <= 1) {
+      return this;
+    }
+    const imgData = this.ctx.getImageData(x, y, width, height);
+    const data = imgData.data;
+    const w = imgData.width;
+    const h = imgData.height;
+
+    for (let r = 0; r < h; r += pixelSize) {
+      for (let c = 0; c < w; c += pixelSize) {
+        const pixelIdx = (r * w + c) * 4;
+        const red = data[pixelIdx] ?? 0;
+        const green = data[pixelIdx + 1] ?? 0;
+        const blue = data[pixelIdx + 2] ?? 0;
+        const alpha = data[pixelIdx + 3] ?? 255;
+
+        for (let dy = 0; dy < pixelSize && r + dy < h; dy++) {
+          for (let dx = 0; dx < pixelSize && c + dx < w; dx++) {
+            const idx = ((r + dy) * w + (c + dx)) * 4;
+            data[idx] = red;
+            data[idx + 1] = green;
+            data[idx + 2] = blue;
+            data[idx + 3] = alpha;
+          }
+        }
+      }
+    }
+    this.ctx.putImageData(imgData, x, y);
+    return this;
+  }
+
+  // ---- Advanced Text methods ----
+
+  /**
+   * Draws text inline with Discord custom emojis (<:name:id> / <a:name:id>).
+   * Automatically fetches custom emojis and aligns them with the text.
+   * @param text - The text string containing custom emojis.
+   * @param x - Horizontal position.
+   * @param y - Vertical position (baseline).
+   * @param color - Text color.
+   * @param align - Text alignment ('left', 'center', 'right'). Defaults to 'left'.
+   * @param emojiSize - Dimension size of the emojis. Defaults to font size.
+   */
+  public async drawTextWithEmojis(
+    text: string, x: number, y: number,
+    color: ColorResolvable, align: 'left' | 'center' | 'right' = 'left',
+    emojiSize?: number
+  ): Promise<this> {
+    const tokens = tokenizeEmojiText(text);
+    const fontSize = parseInt(this.ctx.font, 10) || 16;
+    const eSize = emojiSize ?? fontSize;
+    const spacing = 4;
+
+    const segments: Array<{
+       type: 'text' | 'emoji';
+       content: string;
+       width: number;
+       image?: Image;
+     }> = [];
+
+    let totalWidth = 0;
+
+    for (const token of tokens) {
+      if (token.type === 'text') {
+        const w = this.ctx.measureText(token.content).width;
+        segments.push({ type: 'text', content: token.content, width: w });
+        totalWidth += w;
+      } else {
+        const emojiUrl = `https://cdn.discordapp.com/emojis/${token.content}.png`;
+        const img = await tryLoadImage(emojiUrl);
+        if (img) {
+          segments.push({ type: 'emoji', content: token.content, width: eSize, image: img });
+          totalWidth += eSize + spacing;
+        } else {
+          const fallback = '';
+          const w = this.ctx.measureText(fallback).width;
+          segments.push({ type: 'text', content: fallback, width: w });
+          totalWidth += w;
+        }
+      }
+    }
+
+    let currentX = x;
+    if (align === 'center') {
+      currentX = x - totalWidth / 2;
+    } else if (align === 'right') {
+      currentX = x - totalWidth;
+    }
+
+    this.ctx.save();
+    this.ctx.fillStyle = resolveColor(color);
+    this.ctx.textAlign = 'left';
+
+    for (const segment of segments) {
+      if (segment.type === 'text') {
+        this.ctx.fillText(segment.content, currentX, y);
+        currentX += segment.width;
+      } else if (segment.type === 'emoji' && segment.image) {
+        const emojiY = y - 0.85 * fontSize + (fontSize - eSize) / 2;
+        this.ctx.drawImage(segment.image, currentX, emojiY, eSize, eSize);
+        currentX += segment.width;
+      }
+    }
+
     this.ctx.restore();
     return this;
   }

@@ -14,6 +14,8 @@ Complete API documentation for canvas-forge.
   - [InfoCardBuilder](#infocardbuilder)
   - [LeaderboardCardBuilder](#leaderboardcardbuilder)
   - [SpotifyCardBuilder](#spotifycardbuilder)
+  - [ModerationCardBuilder](#moderationcardbuilder)
+  - [ServerStatsCardBuilder](#serverstatscardbuilder)
 - [CanvasBuilder](#canvasbuilder)
 - [Utilities](#utilities)
 - [Types](#types)
@@ -72,6 +74,14 @@ See [Leaderboard Card docs](./cards/leaderboard-card.md). Ranked leaderboard car
 
 See [Spotify Card docs](./cards/spotify-card.md). Music "Now Playing" cards with album art, progress bar, and timestamps.
 
+### ModerationCardBuilder
+
+See [Moderation Card docs](./cards/moderation-card.md). Log/announcement cards for bans, kicks, mutes, etc.
+
+### ServerStatsCardBuilder
+
+See [Server Stats Card docs](./cards/server-stats-card.md). Grid-based server metric display cards.
+
 ---
 
 ## CanvasBuilder
@@ -113,6 +123,7 @@ new CanvasBuilder(width: number, height: number)
 | `drawBorderedRect(x, y, w, h, color, lineWidth?, radius?)` | Draw bordered rectangle (stroke only) |
 | `drawArc(x, y, radius, startAngle, endAngle, color, lineWidth?)` | Draw arc / partial circle |
 | `drawProgressBar(x, y, w, h, progress, fill, track, radius?)` | Draw progress bar |
+| `pixelate(x, y, w, h, pixelSize?)` | Pixelate region |
 
 ### Text Methods
 
@@ -121,8 +132,9 @@ new CanvasBuilder(width: number, height: number)
 | `setFont(size, family?, weight?)` | Set current font |
 | `drawText(text, x, y, color, align?)` | Draw text |
 | `drawWrappedText(text, x, y, color, maxWidth, lineHeight?)` | Draw wrapped text |
+| `drawTextWithEmojis(text, x, y, color, align?, emojiSize?)` | Draw text with Discord custom emojis inline (async) |
 
-### State Methods
+### State & Filter Methods
 
 | Method | Description |
 |---|---|
@@ -130,6 +142,12 @@ new CanvasBuilder(width: number, height: number)
 | `clearShadow()` | Disable shadow |
 | `setGlobalAlpha(alpha)` | Set global transparency (0.0-1.0) |
 | `resetGlobalAlpha()` | Reset transparency to 1.0 |
+| `setFilter(filterString)` | Set canvas filter string |
+| `clearFilter()` | Clear canvas filters |
+| `applyBlur(pixels)` | Apply CSS blur filter |
+| `applyGrayscale(percent)` | Apply CSS grayscale filter |
+| `applySepia(percent)` | Apply CSS sepia filter |
+| `applyInvert(percent)` | Apply CSS invert filter |
 | `save()` | Save canvas state |
 | `restore()` | Restore canvas state |
 
@@ -223,3 +241,6 @@ import { DiscordColors, StatusColors, DefaultDimensions } from 'canvas-forge';
 | `LeaderboardEntry` | Leaderboard entry `{ rank, username, score, avatar? }` |
 | `SpotifyCardConfig` | Spotify card configuration |
 | `BadgeData` | Profile badge `{ icon, label }` |
+| `ModerationCardConfig` | Moderation card configuration |
+| `ModerationAction` | `'ban' \| 'kick' \| 'mute' \| 'warn' \| 'unban' \| 'unmute'` |
+| `ServerStatsCardConfig` | Server stats card configuration |

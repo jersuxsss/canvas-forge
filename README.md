@@ -16,8 +16,10 @@
 
 | Feature | Description |
 |---|---|
-| 🎨 **9 Built-in Card Builders** | Welcome, Leave, Rank, Level-Up, Profile, Boost, Info, Leaderboard & Spotify cards |
-| 🛠️ **Custom Canvas Builder** | Full creative freedom for your own designs with 20+ drawing methods |
+| 🎨 **11 Built-in Card Builders** | Welcome, Leave, Rank, Level-Up, Profile, Boost, Info, Leaderboard, Spotify, Moderation & Server Stats cards |
+| 🛠️ **Custom Canvas Builder** | Full creative freedom with 25+ drawing methods including filters, pixelation, and radial gradients |
+| 🚀 **Emoji Text Rendering** | Inline support for custom Discord emojis (`<:name:id>`) with automated fetching and centering |
+| 💾 **In-memory Image Cache** | Speed up card generation by caching network/file images during lifetime |
 | ⚡ **High Performance** | Powered by Skia engine via `@napi-rs/canvas` |
 | 📦 **Zero System Dependencies** | No Cairo, no Pango, no `node-gyp` — just `npm install` |
 | 🔷 **TypeScript First** | Full type definitions and IntelliSense support |
@@ -174,6 +176,36 @@ const card = await new SpotifyCardBuilder()
   .build();
 ```
 
+### Moderation Card ✨ NEW
+
+```typescript
+import { ModerationCardBuilder } from 'canvas-forge';
+
+const card = await new ModerationCardBuilder()
+  .setAction('ban')
+  .setAvatar(user.displayAvatarURL({ extension: 'png' }))
+  .setUsername(user.username)
+  .setModerator(interaction.user.username)
+  .setReason('Spamming invites')
+  .setCaseNumber('#1042')
+  .build();
+```
+
+### Server Stats Card ✨ NEW
+
+```typescript
+import { ServerStatsCardBuilder } from 'canvas-forge';
+
+const card = await new ServerStatsCardBuilder()
+  .setGuildName('Pixel Developers')
+  .setGuildIcon(guild.iconURL({ extension: 'png' }))
+  .setTotalMembers(2540)
+  .setOnlineMembers(890)
+  .setBoosts(22)
+  .setBoostLevel(3)
+  .build();
+```
+
 ### Custom Canvas
 
 ```typescript
@@ -266,7 +298,7 @@ import {
   DiscordColors, StatusColors, DefaultDimensions,
 
   // Image loading
-  loadImage, tryLoadImage,
+  loadImage, tryLoadImage, clearImageCache,
 } from 'canvas-forge';
 ```
 

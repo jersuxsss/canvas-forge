@@ -278,5 +278,42 @@ describe('CanvasBuilder', () => {
     expect(buffer).toBeInstanceOf(Buffer);
     expect(buffer.length).toBeGreaterThan(0);
   });
+
+  it('should support image filters', () => {
+    const builder = new CanvasBuilder(200, 200);
+    const result = builder
+      .setFilter('blur(5px)')
+      .applyBlur(3)
+      .applyGrayscale(50)
+      .applySepia(80)
+      .applyInvert(100)
+      .clearFilter();
+    expect(result).toBe(builder);
+  });
+
+  it('should support pixelation', () => {
+    const builder = new CanvasBuilder(200, 200);
+    const result = builder
+      .setBackground('#ffffff')
+      .drawRect(0, 0, 100, 100, '#ff0000')
+      .pixelate(0, 0, 100, 100, 8);
+    expect(result).toBe(builder);
+  });
+
+  it('should support drawTextWithEmojis', async () => {
+    const builder = new CanvasBuilder(400, 100);
+    const result = await builder
+      .setFont(20)
+      .drawTextWithEmojis('Hello <:custom:1234567890> world!', 20, 50, '#ffffff', 'left');
+    expect(result).toBe(builder);
+  });
+
+  it('should support radial gradients', () => {
+    const builder = new CanvasBuilder(200, 200);
+    const result = builder
+      .setBackgroundGradient({ colors: ['#ff0000', '#0000ff'], direction: 'radial' })
+      .drawGradientRect(10, 10, 100, 100, { colors: ['#ff0000', '#0000ff'], direction: 'radial' });
+    expect(result).toBe(builder);
+  });
 });
 

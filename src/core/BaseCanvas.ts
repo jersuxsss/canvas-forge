@@ -189,8 +189,16 @@ export abstract class BaseCanvas<TConfig extends BaseCardConfig> {
     } else if (typeof background === 'object' && !Array.isArray(background) && 'colors' in (background as object)) {
       // Background is a gradient
       const gradientData = background as GradientData;
-      const coords = getGradientCoords(width, height, gradientData.direction);
-      const gradient = this.ctx.createLinearGradient(coords.x0, coords.y0, coords.x1, coords.y1);
+      let gradient;
+      if (gradientData.direction === 'radial') {
+        const cx = width / 2;
+        const cy = height / 2;
+        const r = Math.max(width, height) / 2;
+        gradient = this.ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
+      } else {
+        const coords = getGradientCoords(width, height, gradientData.direction);
+        gradient = this.ctx.createLinearGradient(coords.x0, coords.y0, coords.x1, coords.y1);
+      }
       const stops = createGradientStops(gradientData);
       for (const [offset, color] of stops) {
         gradient.addColorStop(offset, color);

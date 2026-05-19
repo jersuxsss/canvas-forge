@@ -50,11 +50,13 @@ export { BoostCardBuilder } from './cards/BoostCardBuilder';
 export { InfoCardBuilder } from './cards/InfoCardBuilder';
 export { LeaderboardCardBuilder } from './cards/LeaderboardCardBuilder';
 export { SpotifyCardBuilder } from './cards/SpotifyCardBuilder';
+export { ModerationCardBuilder } from './cards/ModerationCardBuilder';
+export { ServerStatsCardBuilder } from './cards/ServerStatsCardBuilder';
 
 // ── Core ───────────────────────────────────────────────────────────────────
 export { CanvasBuilder } from './core/CanvasBuilder';
 export { BaseCanvas } from './core/BaseCanvas';
-export { loadImage, tryLoadImage } from './core/ImageLoader';
+export { loadImage, tryLoadImage, clearImageCache } from './core/ImageLoader';
 
 // ── Utilities ──────────────────────────────────────────────────────────────
 export {
@@ -133,6 +135,9 @@ export type {
   LeaderboardCardConfig,
   LeaderboardEntry,
   SpotifyCardConfig,
+  ModerationCardConfig,
+  ModerationAction,
+  ServerStatsCardConfig,
 } from './types/cards';
 
 // ── Re-export color types from utils ───────────────────────────────────────

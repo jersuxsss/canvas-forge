@@ -8,11 +8,22 @@ import { loadImage as napiLoadImage, type Image } from '@napi-rs/canvas';
 import type { ImageResolvable } from '../types/common';
 import { validateImage } from '../utils/validators';
 
+// In-memory cache for string-based image sources (URLs and file paths)
+const imageCache = new Map<string, Promise<Image>>();
+
+/**
+ * Clears the in-memory image cache.
+ */
+export function clearImageCache(): void {
+  imageCache.clear();
+}
+
 /**
  * Loads an image from various sources (URL, file path, or Buffer).
  *
  * This function wraps `@napi-rs/canvas`'s `loadImage` with better error
- * handling and support for multiple input formats.
+ * handling, support for multiple input formats, and in-memory caching for
+ * URL and file path strings to prevent redundant fetches/reads.
  *
  * @param source - The image source: URL string, file path, Buffer, or URL object.
  * @returns A Promise resolving to the loaded Image.
@@ -20,40 +31,67 @@ import { validateImage } from '../utils/validators';
  *
  * @example
  * ```typescript
- * // Load from URL
+ * // Load from URL (cached after the first load)
  * const avatar = await loadImage('https://cdn.discordapp.com/avatars/...');
  *
- * // Load from file path
+ * // Load from file path (cached after the first load)
  * const bg = await loadImage('./backgrounds/default.png');
  *
- * // Load from Buffer
+ * // Load from Buffer (not cached, as buffers are already in memory)
  * const img = await loadImage(someBuffer);
  * ```
  */
 export async function loadImage(source: ImageResolvable): Promise<Image> {
   validateImage(source, 'source');
 
-  try {
-    if (source instanceof URL) {
-      return await napiLoadImage(source.toString());
-    }
-    return await napiLoadImage(source);
-  } catch (error) {
-    const sourceDesc =
-      typeof source === 'string'
-        ? source.length > 100
-          ? source.slice(0, 100) + '...'
-          : source
-        : source instanceof Buffer
-          ? `Buffer(${source.length} bytes)`
-          : String(source);
+  // We only cache string and URL-based sources to avoid memory leaks with large buffers
+  const cacheKey =
+    typeof source === 'string'
+      ? source
+      : source instanceof URL
+        ? source.toString()
+        : null;
 
-    throw new Error(
-      `[canvas-forge] Failed to load image from "${sourceDesc}": ${
-        error instanceof Error ? error.message : String(error)
-      }`,
-    );
+  if (cacheKey) {
+    const cached = imageCache.get(cacheKey);
+    if (cached) {
+      return cached;
+    }
   }
+
+  const loadPromise = (async (): Promise<Image> => {
+    try {
+      if (source instanceof URL) {
+        return await napiLoadImage(source.toString());
+      }
+      return await napiLoadImage(source);
+    } catch (error) {
+      // If load fails, remove it from cache so future attempts can retry
+      if (cacheKey) {
+        imageCache.delete(cacheKey);
+      }
+      const sourceDesc =
+        typeof source === 'string'
+          ? source.length > 100
+            ? source.slice(0, 100) + '...'
+            : source
+          : source instanceof Buffer
+            ? `Buffer(${source.length} bytes)`
+            : String(source);
+
+      throw new Error(
+        `[canvas-forge] Failed to load image from "${sourceDesc}": ${
+          error instanceof Error ? error.message : String(error)
+        }`,
+      );
+    }
+  })();
+
+  if (cacheKey) {
+    imageCache.set(cacheKey, loadPromise);
+  }
+
+  return loadPromise;
 }
 
 /**
@@ -77,3 +115,4 @@ export async function tryLoadImage(source: ImageResolvable): Promise<Image | nul
     return null;
   }
 }
+

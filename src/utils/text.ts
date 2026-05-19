@@ -120,3 +120,53 @@ export function buildFontString(
 export function centerTextVertically(containerHeight: number, fontSize: number): number {
   return (containerHeight + fontSize) / 2;
 }
+
+/**
+ * A tokenized segment of text or a Discord custom emoji.
+ */
+export interface TextToken {
+  type: 'text' | 'emoji';
+  content: string;
+}
+
+/**
+ * Tokenizes text containing Discord custom emojis into segments.
+ * @param text - The text to tokenize.
+ */
+export function tokenizeEmojiText(text: string): TextToken[] {
+  const tokens: TextToken[] = [];
+  const regex = /<a?:[a-zA-Z0-9_~]+:([0-9]+)>/g;
+  let lastIndex = 0;
+  let match;
+
+  while ((match = regex.exec(text)) !== null) {
+    const matchIndex = match.index;
+    if (match && match[1]) {
+      const emojiId = match[1];
+
+      if (matchIndex > lastIndex) {
+        tokens.push({
+          type: 'text',
+          content: text.substring(lastIndex, matchIndex),
+        });
+      }
+
+      tokens.push({
+        type: 'emoji',
+        content: emojiId,
+      });
+
+      lastIndex = regex.lastIndex;
+    }
+  }
+
+  if (lastIndex < text.length) {
+    tokens.push({
+      type: 'text',
+      content: text.substring(lastIndex),
+    });
+  }
+
+  return tokens;
+}
+

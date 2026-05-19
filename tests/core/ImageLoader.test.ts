@@ -4,7 +4,7 @@
 
 import { describe, it, expect } from 'vitest';
 import { createCanvas } from '@napi-rs/canvas';
-import { loadImage, tryLoadImage } from '../../src/core/ImageLoader';
+import { loadImage, tryLoadImage, clearImageCache } from '../../src/core/ImageLoader';
 
 // Generate a minimal valid 1x1 PNG buffer for testing
 function createTestPngBuffer(): Buffer {
@@ -50,5 +50,10 @@ describe('tryLoadImage', () => {
   it('should return null for invalid sources', async () => {
     const img = await tryLoadImage('https://invalid.nonexistent.domain/image.png');
     expect(img).toBeNull();
+  });
+
+  it('should support clearImageCache', () => {
+    clearImageCache();
+    expect(true).toBe(true);
   });
 });

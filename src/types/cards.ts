@@ -437,3 +437,71 @@ export interface SpotifyCardConfig extends BaseCardConfig {
   /** Color theme. */
   theme: ThemeMode;
 }
+
+// ---------------------------------------------------------------------------
+// Moderation Card
+// ---------------------------------------------------------------------------
+
+/** Moderation action types. */
+export type ModerationAction = 'ban' | 'kick' | 'mute' | 'warn' | 'unban' | 'unmute';
+
+/**
+ * Configuration for the Moderation Card builder.
+ */
+export interface ModerationCardConfig extends BaseCardConfig {
+  /** The moderation action taken. */
+  action: ModerationAction;
+  /** The target user's username. */
+  username: string;
+  /** The target user's avatar image. */
+  avatar: ImageResolvable | null;
+  /** The moderator's username. */
+  moderator: string;
+  /** The reason for the action. */
+  reason: string;
+  /** Case number (e.g. "Case #104"). */
+  caseNumber?: string;
+  /** Accent color. */
+  accentColor: ColorResolvable;
+  /** Title text color. */
+  titleColor: ColorResolvable;
+  /** Value / Content text color. */
+  contentColor: ColorResolvable;
+  /** Label text color. */
+  labelColor: ColorResolvable;
+  /** Color theme. */
+  theme: ThemeMode;
+}
+
+// ---------------------------------------------------------------------------
+// Server Stats Card
+// ---------------------------------------------------------------------------
+
+/**
+ * Configuration for the Server Stats Card builder.
+ */
+export interface ServerStatsCardConfig extends BaseCardConfig {
+  /** The name of the server/guild. */
+  guildName: string;
+  /** The server/guild icon image. */
+  guildIcon: ImageResolvable | null;
+  /** Total member count. */
+  totalMembers: number;
+  /** Online member count. */
+  onlineMembers: number;
+  /** Number of server boosts. */
+  boosts: number;
+  /** Boost level (0, 1, 2, 3). */
+  boostLevel: number;
+  /** Accent color. */
+  accentColor: ColorResolvable;
+  /** Title text color. */
+  titleColor: ColorResolvable;
+  /** Value text color. */
+  valueColor: ColorResolvable;
+  /** Label text color. */
+  labelColor: ColorResolvable;
+  /** Color theme. */
+  theme: ThemeMode;
+}
+

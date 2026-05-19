@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2026-05-19
+
+### Added
+
+- **ModerationCardBuilder** — Create moderation action cards (ban, kick, mute, warn, unban, unmute) with customizable action accent themes and case numbers
+- **ServerStatsCardBuilder** — Create grid-based server statistic cards showing total members, online members, boost counts, and tiers with status progress bars
+- **CanvasBuilder Advanced Features**:
+  - `drawTextWithEmojis()` — Inline support for Discord custom emojis (`<:name:id>`) with automatic CDN downloading and vertical alignment centering
+  - `pixelate()` — Custom pixelation effect for specific rectangular regions (e.g. obscuring avatars or details)
+  - `setFilter()` / `clearFilter()` / `applyBlur()` / `applyGrayscale()` / `applySepia()` / `applyInvert()` — Native CSS-like image filters
+  - Support for `radial` gradients in background fills and rectangle drawing
+- **In-memory Image Cache** in `ImageLoader` to cache network and filesystem images, preventing redundant reads and HTTP requests
+- `clearImageCache()` utility function to clear the memory cache
+- Type definitions: `ModerationCardConfig`, `ModerationAction`, `ServerStatsCardConfig`
+- Default dimensions for Moderation and Server Stats cards
+- Additional unit tests covering new features (reaching 226 total tests)
+- Documentation and examples for all 1.2.0 features
+
 ## [1.1.0] - 2026-05-17
 
 ### Added
